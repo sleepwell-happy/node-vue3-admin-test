@@ -71,3 +71,57 @@ router.get('/login', function (req, res, next) {
         }
     })
 })
+
+//token中间件
+router.use((req, res, next) => {
+   
+  let token = req.headers.token
+  if (!token) {
+   
+    console.log("===没有权限===");
+    res.send(endMassage({
+    data: "没有权限", code: 0 }))
+  }
+  let massage;
+  let startTime;
+  let endTime = new Date().getTime()
+  try {
+   
+    token ? massage = token.split('zjjq')[0].split('').reverse().join('') : massage = '未登录'; //取用户名
+  } catch{
+   
+    res.send(endMassage({
+    data: "没有权限", code: 0 }))
+  }
+  console.log(`**********${
+     new Date().toLocaleString()}有人访问接口${
+     req.url} ===用户名是：${
+     massage}===***********`);
+  token ? startTime = token.split('zjjq')[1] : 123
+  endTime - startTime > 60 * 1000 * 60 ? res.send(endMassage({
+    data: "身份验证过期，请从新登录", code: 0 })) : '' //一小时过期
+  console.log("===开始判断是否有权限===");
+  if (massage == '未登录') {
+   
+    console.log("===没有权限===");
+    res.send(endMassage({
+    data: "没有权限", code: 0 }))
+  }
+  else {
+   
+    Db.DBFun(`select username,password,uuid from user where username='${
+     massage}'`, (data) => {
+   
+      if (data.length) {
+   
+        console.log("===ss有权限===");
+        next()
+      } else {
+   
+        console.log("===没用有权限，用户名没有查到===");
+        res.send(endMassage({
+    data: "没有权限", code: 0 }))
+      }
+    })
+  }
+})
