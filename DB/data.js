@@ -12,10 +12,11 @@ const option = {
 }
 // 创建连接对象 并将对象抛出供其他文件使用
 const conn = mysql.createConnection(option)
+
 const DBFun=function(sql,callback){
-    connection.query(sql,function(err,result){
-        if(err) console.log(err)
-        callback(result)
+    conn.query(sql,function(err,result){
+        console.log("err",err)
+        callback(err,result)
     })
 }
 module.exports = {conn,DBFun};
